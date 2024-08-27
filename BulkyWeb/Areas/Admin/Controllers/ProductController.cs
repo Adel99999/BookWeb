@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Bulky.Models.ViewModels;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 namespace BulkyWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
@@ -103,11 +104,41 @@ namespace BulkyWeb.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult Delete(Product obj)
         {
-            if (obj is null) { return NotFound(); }
-            _UnitOfWork.ProductRepository.Remove(obj);
+            // Fetch the product from the database using the ID
+            var product = _UnitOfWork.ProductRepository.Get(x=>x.Id==obj.Id);
+            if (product is null) { return NotFound(); }
+
+            // Replace backslashes with forward slashes and trim any leading slashes
+            var imageUrl = product.ImageUrl?.Replace('\\', '/').TrimStart('/');
+
+            // Check if ImageUrl is not null or empty
+            if (!string.IsNullOrEmpty(imageUrl))
+            {
+                // Get the image path, assuming ImageUrl includes the full path relative to wwwroot
+                var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, imageUrl);
+
+                // Log the path for debugging purposes
+                Console.WriteLine($"Image Path: {imagePath}");
+
+                // Check if the file exists
+                if (System.IO.File.Exists(imagePath))
+                {
+                    // Delete the file from wwwroot
+                    System.IO.File.Delete(imagePath);
+                }
+            }
+
+            // Remove the product from the database
+            _UnitOfWork.ProductRepository.Remove(product);
             _UnitOfWork.Save();
+
             TempData["success"] = "Deleted Successfully";
             return RedirectToAction("Index", "Product");
         }
+
+
+
+
+
     }
 }

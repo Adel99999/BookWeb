@@ -1,6 +1,7 @@
 ﻿@model Product
 
 <form method="post">
+    <input asp-for="ImageUrl" hidden/>
     <div class="border p-3 mt-4">
         <div class="row pb-2">
             <h2 class="text-primary">Delete Product</h2>
@@ -37,6 +38,11 @@
         <div class="mb-3">
             <label>Price100</label>
             <input asp-for="Price100" type="text" calss="form-control" readonly></input>
+        </div>
+        <div class="mb-3">
+            <label>ImageURL</label>
+            <input type="file" name="file" class="form-control"></input>
+            <span asp-validation-for="ImageUrl" class="text-danger"></span>
         </div>
         <button type="submit" class="btn btn-primary" style="width:150px">Delete</button>
         <a asp-controller="Product" asp-action="Index" class="btn btn-primary">back to list</a>
