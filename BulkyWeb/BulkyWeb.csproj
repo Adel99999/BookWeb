@@ -7,9 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\**" />
     <Compile Remove="FakesAssemblies\**" />
+    <Content Remove="Controllers\**" />
     <Content Remove="FakesAssemblies\**" />
+    <EmbeddedResource Remove="Controllers\**" />
     <EmbeddedResource Remove="FakesAssemblies\**" />
+    <None Remove="Controllers\**" />
     <None Remove="FakesAssemblies\**" />
   </ItemGroup>
 
@@ -33,10 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Update="Views\_ViewImports.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -45,6 +45,10 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\images\product\" />
   </ItemGroup>
 
 </Project>
