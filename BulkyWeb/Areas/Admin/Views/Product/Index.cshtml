@@ -6,11 +6,19 @@
             <h2 class="text-primary">
                 Product List
             </h2>
-        </div>
-        <div class="col-6 text-end"> 
             <a asp-controller="Product" asp-action="Upsert" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Create New Product
             </a>
+        </div>
+        <div class="col-6 text-end">
+            <form asp-action="Index" method="post" class="d-inline">
+                <label for="SearchTerm">Search</label>
+                <input type="text" id="SearchTerm" name="SearchTerm" class="form-control d-inline" style="width: 70%;" />
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Search
+                </button> 
+                
+            </form>
         </div>
     </div>
 
@@ -18,21 +26,21 @@
         <thead>
             <tr>
                 <th>
-                Title    
+                    Title
                 </th>
                 <th>
                     ISBN
-                </th>  
+                </th>
                 <th>
                     Price
-                </th>  
+                </th>
                 <th>
-                     Author
-                </th>   
+                    Author
+                </th>
                 <th>
                     Category
                 </th>
-                
+
                 <th></th>
             </tr>
         </thead>
@@ -45,25 +53,25 @@
                     </td>
                     <td>
                         @obj.ISBN
-                    </td>  
+                    </td>
                     <td>
                         @obj.ListPrice
-                    </td> 
+                    </td>
                     <td>
                         @obj.Author
                     </td>
                     <td>
                         @obj.category.Name
-                    </td>  
-                        
+                    </td>
+
                     <td>
                         <div>
-                        <a asp-controller="Product" asp-action="Upsert" asp-route-id="@obj.Id" class="btn btn-primary">
+                            <a asp-controller="Product" asp-action="Upsert" asp-route-id="@obj.Id" class="btn btn-primary">
                                 <i class="bi bi-pencil-square"></i>   Edit
-                        </a>
-                        <a asp-controller="Product" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-primary">
+                            </a>
+                            <a asp-controller="Product" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-primary">
                                 <i class="bi bi-trash"></i> Delete
-                        </a>
+                            </a>
                         </div>
                     </td>
                 </tr>

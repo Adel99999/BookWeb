@@ -25,6 +25,27 @@ namespace BulkyWeb.Areas.Admin.Controllers
         {
             return View(_UnitOfWork.ProductRepository.GetAll());
         }
+        // POST: Product
+        private IEnumerable<Product> SearchProducts(string searchTerm)
+        {
+            var lowerSearchTerm = searchTerm.ToLower();
+
+            return _UnitOfWork.ProductRepository.GetAll()
+                .Where(p => p.Title.ToLower().Contains(lowerSearchTerm) ||
+                            p.Author.ToLower().Contains(lowerSearchTerm) ||
+                            p.category.Name.ToLower().Contains(lowerSearchTerm));
+        }
+
+
+        [HttpPost]
+        public IActionResult Index(string SearchTerm)
+        {
+            var products = string.IsNullOrEmpty(SearchTerm)
+                ? _UnitOfWork.ProductRepository.GetAll()
+                : SearchProducts(SearchTerm);
+
+            return View(products.ToList());
+        }
         public IActionResult Upsert(int? id)
         {
 
