@@ -8,6 +8,7 @@ namespace Bulky.DataAccess.Data
         public DbSet<Category> cateogries { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ApplicationUsers> ApplicationUsers { get; set; }
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options):base(options)
         {
 
@@ -33,7 +34,7 @@ namespace Bulky.DataAccess.Data
                     Price = 90,
                     Price50 = 85,
                     Price100 = 80,
-                    CategoryId =33,
+                    CategoryId =3,
                     ImageUrl=""
                 },
                 new Product
@@ -47,7 +48,7 @@ namespace Bulky.DataAccess.Data
                     Price = 30,
                     Price50 = 25,
                     Price100 = 20,
-                    CategoryId =33,
+                    CategoryId =3,
                     ImageUrl = ""
                 },
                 new Product
@@ -61,7 +62,7 @@ namespace Bulky.DataAccess.Data
                     Price = 50,
                     Price50 = 40,
                     Price100 = 30,
-                    CategoryId =33,
+                    CategoryId =3,
                     ImageUrl = ""
                 },
                 new Product
@@ -75,7 +76,7 @@ namespace Bulky.DataAccess.Data
                     Price = 65,
                     Price50 = 60,
                     Price100 = 55,
-                    CategoryId =33,
+                    CategoryId =3,
                     ImageUrl = ""
                 },
                 new Product
@@ -89,7 +90,7 @@ namespace Bulky.DataAccess.Data
                     Price = 27,
                     Price50 = 25,
                     Price100 = 20,
-                    CategoryId =33,
+                    CategoryId =3,
                     ImageUrl = ""
                 },
                 new Product
@@ -103,7 +104,7 @@ namespace Bulky.DataAccess.Data
                     Price = 23,
                     Price50 = 22,
                     Price100 = 20,
-                    CategoryId =33,
+                    CategoryId =3,
                     ImageUrl = ""
                 });
             

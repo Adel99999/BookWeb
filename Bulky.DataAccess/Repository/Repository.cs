@@ -34,13 +34,17 @@ namespace Bulky.DataAccess.Repository
             {
                 query = query.Include(p => ((Product)(object)p).category);
             }
+            if (typeof(T) == typeof(ShoppingCart))
+            {
+                query = query.Include(p => ((ShoppingCart)(object)p).product);
+            }
 
             query = query.Where(filter);
             return query.FirstOrDefault();
         }
         
 
-        public IEnumerable<T> GetAll()
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter=null)
         {
             IQueryable<T> query = dbSet;
 
@@ -49,9 +53,14 @@ namespace Bulky.DataAccess.Repository
             {
                 query = query.Include(p => ((Product)(object)p).category);
             }
+            if (typeof(T) == typeof(ShoppingCart))
+            {
+                query = query.Include(p => ((ShoppingCart)(object)p).product);
+            }
 
             return query.ToList();
         }
+
 
         public void Remove(T entity)
         {
