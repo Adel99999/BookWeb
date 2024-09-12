@@ -57,6 +57,10 @@ namespace Bulky.DataAccess.Repository
             {
                 query = query.Include(p => ((ShoppingCart)(object)p).product);
             }
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
 
             return query.ToList();
         }

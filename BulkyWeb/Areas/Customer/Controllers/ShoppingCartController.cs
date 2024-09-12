@@ -19,7 +19,8 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
         public IActionResult Index()
         {
-            var claims = (ClaimsIdentity)User.Identity;
+
+			var claims = (ClaimsIdentity)User.Identity;
             var userId = claims.FindFirst(ClaimTypes.NameIdentifier).Value;
             ShoppingCartVM obj = new()
             {
@@ -35,7 +36,8 @@ namespace BulkyWeb.Areas.Customer.Controllers
         }
         public IActionResult Summary()
         {
-            var claims = (ClaimsIdentity)User.Identity;
+
+			var claims = (ClaimsIdentity)User.Identity;
             var userId = claims.FindFirst(ClaimTypes.NameIdentifier).Value;
             ShoppingCartVM obj = new()
             {
