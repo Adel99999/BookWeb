@@ -143,7 +143,11 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 user.PhoneNumber = Input.PhoneNumber;
-                
+                user.City= Input.City;
+                user.PostalCode= Input.PostalCode;
+                user.StreetAdress= Input.StreetAdress;
+                user.Name = Input.Name;
+                user.State = Input.State;
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
@@ -192,21 +196,22 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private IdentityUser CreateUser()
-        {
-            try
-            {
-                return Activator.CreateInstance<ApplicationUsers>();
-            }
-            catch
-            {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(IdentityUser)}'. " +
-                    $"Ensure that '{nameof(IdentityUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
-                    $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
-            }
-        }
+		private ApplicationUsers CreateUser()
+		{
+			try
+			{
+				return Activator.CreateInstance<ApplicationUsers>();
+			}
+			catch
+			{
+				throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUsers)}'. " +
+					$"Ensure that '{nameof(ApplicationUsers)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+					$"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
+			}
+		}
 
-        private IUserEmailStore<IdentityUser> GetEmailStore()
+
+		private IUserEmailStore<IdentityUser> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)
             {

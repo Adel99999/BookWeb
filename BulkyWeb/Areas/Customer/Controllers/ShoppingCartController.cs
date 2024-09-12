@@ -23,19 +23,40 @@ namespace BulkyWeb.Areas.Customer.Controllers
             var userId = claims.FindFirst(ClaimTypes.NameIdentifier).Value;
             ShoppingCartVM obj = new()
             {
-                shoppingCartList = _UnitOfWork.shoppingCartRepository.GetAll(u => u.ApplicationUserId==userId)
-
+                shoppingCartList = _UnitOfWork.shoppingCartRepository.GetAll(u => u.ApplicationUserId==userId),
+                orderHeader=new()
             };
             foreach(var cart in obj.shoppingCartList)
             {
                 cart.Price = GetPriceBasedOnQunatity(cart);
-                obj.OrderTotal += (cart.Price * cart.Count);
+                obj.orderHeader.OrderTotal += (cart.Price * cart.Count);
             }
             return View(obj);
         }
         public IActionResult Summary()
         {
-            return View();
+            var claims = (ClaimsIdentity)User.Identity;
+            var userId = claims.FindFirst(ClaimTypes.NameIdentifier).Value;
+            ShoppingCartVM obj = new()
+            {
+                shoppingCartList = _UnitOfWork.shoppingCartRepository.GetAll(u => u.ApplicationUserId == userId),
+                orderHeader = new()
+            };
+            obj.orderHeader.ApplicationUser = _UnitOfWork.applicationUserRepository.Get(u => u.Id == userId);
+            obj.orderHeader.Name = obj.orderHeader.ApplicationUser.Name;
+            obj.orderHeader.PhoneNumber = obj.orderHeader.ApplicationUser.PhoneNumber;
+            obj.orderHeader.StreetAddress = obj.orderHeader.ApplicationUser.StreetAdress;
+            obj.orderHeader.City = obj.orderHeader.ApplicationUser.City;
+            obj.orderHeader.State = obj.orderHeader.ApplicationUser.State;
+            obj.orderHeader.PostalCode = obj.orderHeader.ApplicationUser.PostalCode;
+
+
+            foreach (var cart in obj.shoppingCartList)
+            {
+                cart.Price = GetPriceBasedOnQunatity(cart);
+                obj.orderHeader.OrderTotal += (cart.Price * cart.Count);
+            }
+            return View(obj);
         }
         public IActionResult Plus(int cartId)
         {
@@ -60,7 +81,7 @@ namespace BulkyWeb.Areas.Customer.Controllers
             _UnitOfWork.Save();
             return RedirectToAction("Index");
         }
-        public IActionResult Reomve(int cartId)
+        public IActionResult Remove(int cartId)
         {
             var cartDb = _UnitOfWork.shoppingCartRepository.Get(u => u.Id == cartId);
             _UnitOfWork.shoppingCartRepository.Remove(cartDb);
