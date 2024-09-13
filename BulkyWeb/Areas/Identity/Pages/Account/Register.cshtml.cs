@@ -116,8 +116,6 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
             if (!_roleManger.RoleExistsAsync(SD.Role_Customer).GetAwaiter().GetResult())
             {
                 _roleManger.CreateAsync(new IdentityRole(SD.Role_Customer)).GetAwaiter().GetResult();
-                _roleManger.CreateAsync(new IdentityRole(SD.Role_Employee)).GetAwaiter().GetResult();
-                _roleManger.CreateAsync(new IdentityRole(SD.Role_Company)).GetAwaiter().GetResult();
                 _roleManger.CreateAsync(new IdentityRole(SD.Role_Admin)).GetAwaiter().GetResult();
             }
             Input = new()

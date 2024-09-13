@@ -1,6 +1,7 @@
 ﻿using Bulky.DataAccess.Repository.IRepository;
 using Bulky.Models;
 using Bulky.Models.ViewModels;
+using Bulky.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -12,6 +13,8 @@ namespace BulkyWeb.Areas.Customer.Controllers
     public class ShoppingCartController : Controller
     {
         private readonly IUnitOfWork _UnitOfWork;
+        [BindProperty]
+        public ShoppingCartVM obj {  get; set; }
         public ShoppingCartController(IUnitOfWork unitOfWork)
         {
             _UnitOfWork = unitOfWork;
@@ -22,7 +25,7 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
 			var claims = (ClaimsIdentity)User.Identity;
             var userId = claims.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ShoppingCartVM obj = new()
+            obj = new()
             {
                 shoppingCartList = _UnitOfWork.shoppingCartRepository.GetAll(u => u.ApplicationUserId==userId),
                 orderHeader=new()
@@ -39,7 +42,7 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
 			var claims = (ClaimsIdentity)User.Identity;
             var userId = claims.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ShoppingCartVM obj = new()
+            obj = new()
             {
                 shoppingCartList = _UnitOfWork.shoppingCartRepository.GetAll(u => u.ApplicationUserId == userId),
                 orderHeader = new()
@@ -58,9 +61,54 @@ namespace BulkyWeb.Areas.Customer.Controllers
                 cart.Price = GetPriceBasedOnQunatity(cart);
                 obj.orderHeader.OrderTotal += (cart.Price * cart.Count);
             }
+           
+
             return View(obj);
         }
-        public IActionResult Plus(int cartId)
+        public IActionResult OrderConfirmation(int id)
+        {
+            return View(id);
+        }
+        [HttpPost]
+        [ActionName("Summary")]
+        public IActionResult SummaryPost()
+        {
+
+			var claims = (ClaimsIdentity)User.Identity;
+            var userId = claims.FindFirst(ClaimTypes.NameIdentifier).Value;
+            obj.shoppingCartList = _UnitOfWork.shoppingCartRepository.GetAll(u => u.ApplicationUserId == userId);
+            obj.orderHeader.OrderDate = DateTime.Now;
+            obj.orderHeader.ApplicationUserId = userId;
+            obj.orderHeader.ApplicationUser = _UnitOfWork.applicationUserRepository.Get(u => u.Id == userId);
+            
+
+            foreach (var cart in obj.shoppingCartList)
+            {
+                cart.Price = GetPriceBasedOnQunatity(cart);
+                obj.orderHeader.OrderTotal += (cart.Price * cart.Count);
+            }
+			obj.orderHeader.PaymentStatus = SD.PaymentStatusPending;
+			obj.orderHeader.OrderStatus = SD.StatusPending;
+			_UnitOfWork.orderHeaderRepo.Add(obj.orderHeader);
+			_UnitOfWork.Save();
+			foreach (var cart in obj.shoppingCartList)
+			{
+				OrderDetail orderDetail = new()
+				{
+					ProductId = cart.ProductId,
+					OrderHeaderId = obj.orderHeader.Id,
+					Price = cart.Price,
+					Count = cart.Count
+				};
+				_UnitOfWork.orderDetailRepo.Add(orderDetail);
+				_UnitOfWork.Save();
+			}
+			return RedirectToAction("OrderConfirmation", new { id = obj.orderHeader.Id });
+		}
+
+
+
+		public IActionResult Plus(int cartId)
         {
             var cartDb = _UnitOfWork.shoppingCartRepository.Get(u => u.Id == cartId);
             cartDb.Count += 1;

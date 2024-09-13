@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bulky.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240912041407_addOrderDetail&Header")]
-    partial class addOrderDetailHeader
+    [Migration("20240913025910_reset&LastSystem")]
+    partial class resetLastSystem
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
