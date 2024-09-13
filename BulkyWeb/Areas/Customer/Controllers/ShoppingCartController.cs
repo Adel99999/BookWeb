@@ -73,42 +73,63 @@ namespace BulkyWeb.Areas.Customer.Controllers
         [ActionName("Summary")]
         public IActionResult SummaryPost()
         {
-
-			var claims = (ClaimsIdentity)User.Identity;
+            var claims = (ClaimsIdentity)User.Identity;
             var userId = claims.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            // Retrieve shopping cart for the user
             obj.shoppingCartList = _UnitOfWork.shoppingCartRepository.GetAll(u => u.ApplicationUserId == userId);
+
+            // Create new order
             obj.orderHeader.OrderDate = DateTime.Now;
             obj.orderHeader.ApplicationUserId = userId;
             obj.orderHeader.ApplicationUser = _UnitOfWork.applicationUserRepository.Get(u => u.Id == userId);
-            
 
+            // Calculate order total
             foreach (var cart in obj.shoppingCartList)
             {
                 cart.Price = GetPriceBasedOnQunatity(cart);
                 obj.orderHeader.OrderTotal += (cart.Price * cart.Count);
             }
-			obj.orderHeader.PaymentStatus = SD.PaymentStatusPending;
-			obj.orderHeader.OrderStatus = SD.StatusPending;
-			_UnitOfWork.orderHeaderRepo.Add(obj.orderHeader);
-			_UnitOfWork.Save();
-			foreach (var cart in obj.shoppingCartList)
-			{
-				OrderDetail orderDetail = new()
-				{
-					ProductId = cart.ProductId,
-					OrderHeaderId = obj.orderHeader.Id,
-					Price = cart.Price,
-					Count = cart.Count
-				};
-				_UnitOfWork.orderDetailRepo.Add(orderDetail);
-				_UnitOfWork.Save();
-			}
-			return RedirectToAction("OrderConfirmation", new { id = obj.orderHeader.Id });
-		}
+
+            // Set order status
+            obj.orderHeader.PaymentStatus = SD.PaymentStatusPending;
+            obj.orderHeader.OrderStatus = SD.StatusPending;
+
+            // Save order header
+            _UnitOfWork.orderHeaderRepo.Add(obj.orderHeader);
+            _UnitOfWork.Save();
+
+            // Save order details
+            foreach (var cart in obj.shoppingCartList)
+            {
+                OrderDetail orderDetail = new()
+                {
+                    ProductId = cart.ProductId,
+                    OrderHeaderId = obj.orderHeader.Id,
+                    Price = cart.Price,
+                    Count = cart.Count
+                };
+                _UnitOfWork.orderDetailRepo.Add(orderDetail);
+                _UnitOfWork.Save();
+            }
+
+            // Clear shopping cart after the order is placed
+            foreach (var cart in obj.shoppingCartList)
+            {
+                _UnitOfWork.shoppingCartRepository.Remove(cart);
+            }
+
+            // Save changes after removing the shopping cart items
+            _UnitOfWork.Save();
+
+            // Redirect to order confirmation page
+            return RedirectToAction("OrderConfirmation", new { id = obj.orderHeader.Id });
+        }
 
 
 
-		public IActionResult Plus(int cartId)
+
+        public IActionResult Plus(int cartId)
         {
             var cartDb = _UnitOfWork.shoppingCartRepository.Get(u => u.Id == cartId);
             cartDb.Count += 1;
