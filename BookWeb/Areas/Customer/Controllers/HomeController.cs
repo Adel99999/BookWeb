@@ -3,6 +3,8 @@ using BookWeb.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Net.Mail;
+using System.Net;
 using System.Security.Claims;
 
 namespace BookWeb.Areas.Customer.Controllers
@@ -65,8 +67,47 @@ namespace BookWeb.Areas.Customer.Controllers
 		{
 			return View();
 		}
+        public IActionResult ContactUs()
+        {
+            return View("contactUs");
+        }
+        [HttpPost]
+        public async Task<IActionResult> SendMessage(string name, string email, string message)
+        {
+            try
+            {
 
-		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(email),
+                    Subject = $"Contact Form Message from {name}",
+                    Body = $"Name: {name}\nEmail: {email}\nMessage: {message}",
+                    IsBodyHtml = false,
+                };
+
+
+                mailMessage.To.Add("tarbshaaska@gmail.com");
+
+
+                using (var smtpClient = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    smtpClient.Credentials = new NetworkCredential("tarbshaaska@gmail.com", "pkox glza duat ltow");
+                    smtpClient.EnableSsl = true;
+                    await smtpClient.SendMailAsync(mailMessage);
+                }
+
+                TempData["Message"] = "Your message was sent successfully!";
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = $"Failed to send the message. Error: {ex.Message}";
+            }
+
+
+            return RedirectToAction("ContactUs");
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult Error()
 		{
 			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
