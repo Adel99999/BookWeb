@@ -39,14 +39,22 @@ namespace BookWeb.Areas.Customer.Controllers
         }
         public IActionResult Summary()
         {
-
-			var claims = (ClaimsIdentity)User.Identity;
+            var claims = (ClaimsIdentity)User.Identity;
             var userId = claims.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             obj = new()
             {
                 shoppingCartList = _UnitOfWork.shoppingCartRepository.GetAll(u => u.ApplicationUserId == userId),
                 orderHeader = new()
             };
+
+            // Check if the shopping cart is empty
+            if (obj.shoppingCartList == null || !obj.shoppingCartList.Any())
+            {
+                // Redirect to another page if the shopping cart is empty
+                return RedirectToAction("Index", "ShoppingCart");
+            }
+
             obj.orderHeader.ApplicationUser = _UnitOfWork.applicationUserRepository.Get(u => u.Id == userId);
             obj.orderHeader.Name = obj.orderHeader.ApplicationUser.Name;
             obj.orderHeader.PhoneNumber = obj.orderHeader.ApplicationUser.PhoneNumber;
@@ -55,16 +63,15 @@ namespace BookWeb.Areas.Customer.Controllers
             obj.orderHeader.State = obj.orderHeader.ApplicationUser.State;
             obj.orderHeader.PostalCode = obj.orderHeader.ApplicationUser.PostalCode;
 
-
             foreach (var cart in obj.shoppingCartList)
             {
                 cart.Price = GetPriceBasedOnQunatity(cart);
                 obj.orderHeader.OrderTotal += (cart.Price * cart.Count);
             }
-           
 
             return View(obj);
         }
+
         public IActionResult OrderConfirmation(int id)
         {
             return View(id);
